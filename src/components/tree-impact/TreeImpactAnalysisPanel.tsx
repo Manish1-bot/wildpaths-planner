@@ -38,8 +38,8 @@ export function TreeImpactAnalysisPanel({
   const [selectedDevDataset, setSelectedDevDataset] = useState<string | null>(null);
   const [bufferMeters, setBufferMeters] = useState(50);
 
-  const treesDatasets = treeDatasets.filter(d => d.dataset_type === 'trees');
-  const devDatasets = treeDatasets.filter(d => d.dataset_type === 'development');
+  const treesDatasets = treeDatasets.filter(d => d.dataset_type === 'trees_before');
+  const devDatasets = treeDatasets.filter(d => d.dataset_type === 'development_layer');
 
   const selectedTrees = treeDatasets.find(d => d.id === selectedTreesDataset);
   const selectedDev = treeDatasets.find(d => d.id === selectedDevDataset);

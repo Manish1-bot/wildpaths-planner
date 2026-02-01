@@ -77,7 +77,7 @@ export default function TreeImpactPage() {
     await uploadTreeDataset.mutateAsync({ 
       file, 
       projectId: project.id, 
-      datasetType: 'trees' 
+      datasetType: 'trees_before' 
     });
   };
 
@@ -85,7 +85,7 @@ export default function TreeImpactPage() {
     await uploadTreeDataset.mutateAsync({ 
       file, 
       projectId: project.id, 
-      datasetType: 'development' 
+      datasetType: 'development_layer' 
     });
   };
 
@@ -106,7 +106,7 @@ export default function TreeImpactPage() {
   const latestResult = analysisResults[0];
 
   // Get development data for map
-  const devDataset = treeDatasets.find(d => d.dataset_type === 'development');
+  const devDataset = treeDatasets.find(d => d.dataset_type === 'development_layer');
 
   return (
     <div className="min-h-screen bg-background">
@@ -163,7 +163,7 @@ export default function TreeImpactPage() {
             <TreeDataUploader
               onUploadTrees={handleUploadTrees}
               onUploadDevelopment={handleUploadDevelopment}
-              isUploadingTrees={uploadTreeDataset.isPending && treeDatasets.some(d => d.dataset_type === 'trees')}
+              isUploadingTrees={uploadTreeDataset.isPending && treeDatasets.some(d => d.dataset_type === 'trees_before')}
               isUploadingDevelopment={uploadTreeDataset.isPending}
             />
           </TabsContent>

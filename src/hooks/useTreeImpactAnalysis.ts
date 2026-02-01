@@ -9,7 +9,7 @@ export interface TreeDataset {
   project_id: string;
   user_id: string;
   name: string;
-  dataset_type: 'trees' | 'development';
+  dataset_type: 'trees_before' | 'development_layer';
   geojson_data: any;
   metadata: any;
   created_at: string;
@@ -52,7 +52,7 @@ export function useTreeDatasets(projectId: string | undefined) {
       if (error) throw error;
       return (data || []).map(d => ({
         ...d,
-        dataset_type: d.dataset_type as 'trees' | 'development',
+        dataset_type: d.dataset_type as 'trees_before' | 'development_layer',
       }));
     },
     enabled: !!projectId && !!user,
@@ -66,7 +66,7 @@ export function useTreeDatasets(projectId: string | undefined) {
     }: { 
       file: File; 
       projectId: string; 
-      datasetType: 'trees' | 'development';
+      datasetType: 'trees_before' | 'development_layer';
     }) => {
       if (!user) throw new Error('Not authenticated');
       
@@ -104,7 +104,7 @@ export function useTreeDatasets(projectId: string | undefined) {
       queryClient.invalidateQueries({ queryKey: ['tree-datasets'] });
       toast({
         title: 'Dataset uploaded',
-        description: `${variables.datasetType === 'trees' ? 'Tree' : 'Development'} data uploaded successfully.`,
+        description: `${variables.datasetType === 'trees_before' ? 'Tree' : 'Development'} data uploaded successfully.`,
       });
     },
     onError: (error: Error) => {
