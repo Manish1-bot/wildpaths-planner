@@ -59,8 +59,8 @@ export default function Index() {
                 <TreePine className="h-6 w-6 text-primary" />
               </div>
               <div>
-                <h1 className="text-xl font-heading font-bold text-primary">TerraByte</h1>
-                <p className="text-xs text-muted-foreground">Wildlife Corridor Planning</p>
+                <h1 className="text-xl font-heading font-bold text-primary">EcoImpact</h1>
+                <p className="text-xs text-muted-foreground">GIS-Based Environmental Impact Analysis</p>
               </div>
             </div>
 
@@ -94,16 +94,16 @@ export default function Index() {
           <div className="max-w-3xl mx-auto text-center text-white">
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 backdrop-blur-sm mb-6">
               <Shield className="h-4 w-4" />
-              <span className="text-sm">Conservation-First GIS Platform</span>
+              <span className="text-sm">Environmental Impact Analysis Platform</span>
             </div>
             
             <h1 className="text-4xl md:text-6xl font-heading font-bold mb-6 leading-tight">
-              Plan Wildlife Corridors with Precision
+              Analyze Environmental Impact with Precision
             </h1>
             
             <p className="text-xl text-white/80 mb-8 leading-relaxed">
-              TerraByte is a production-grade GIS platform for wildlife conservation planning. 
-              Upload data, design corridors, analyze connectivity, and generate professional reports.
+              EcoImpact is a production-grade GIS platform for environmental impact analysis. 
+              Upload data, analyze tree coverage, assess development impact, and generate professional reports.
             </p>
             
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
@@ -138,10 +138,10 @@ export default function Index() {
         <div className="container mx-auto px-4">
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-heading font-bold mb-4">
-              Powerful Tools for Conservation
+              Powerful Tools for Environmental Analysis
             </h2>
             <p className="text-muted-foreground max-w-2xl mx-auto">
-              Everything you need to plan effective wildlife corridors, from data upload to final reports.
+              Everything you need to analyze environmental impact, from data upload to final reports.
             </p>
           </div>
           
@@ -167,12 +167,12 @@ export default function Index() {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             <div>
               <h2 className="text-3xl md:text-4xl font-heading font-bold mb-6">
-                Built for Conservation Professionals
+                Built for Environmental Professionals
               </h2>
               <p className="text-muted-foreground mb-6 leading-relaxed">
-                TerraByte combines powerful GIS capabilities with an intuitive interface designed 
-                specifically for wildlife corridor planning. Whether you're a conservation planner, 
-                NGO representative, or researcher, our platform provides the tools you need.
+                EcoImpact combines powerful GIS capabilities with an intuitive interface designed 
+                specifically for environmental impact analysis. Whether you're an environmental planner, 
+                conservation specialist, or researcher, our platform provides the tools you need.
               </p>
               
               <div className="space-y-4">
@@ -246,10 +246,10 @@ export default function Index() {
           <div className="flex flex-col md:flex-row items-center justify-between gap-4">
             <div className="flex items-center gap-2">
               <TreePine className="h-5 w-5 text-primary" />
-              <span className="font-heading font-bold text-primary">TerraByte</span>
+              <span className="font-heading font-bold text-primary">EcoImpact</span>
             </div>
             <p className="text-sm text-muted-foreground">
-              © {new Date().getFullYear()} TerraByte. Built for wildlife conservation.
+              © {new Date().getFullYear()} EcoImpact. Built for environmental impact analysis.
             </p>
           </div>
         </div>

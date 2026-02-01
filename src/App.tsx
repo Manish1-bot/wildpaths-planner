@@ -18,6 +18,8 @@ import UploadPage from "./pages/UploadPage";
 import About from "./pages/About";
 import Unauthorized from "./pages/Unauthorized";
 import NotFound from "./pages/NotFound";
+import TreeImpactPage from "./pages/TreeImpactPage";
+import TreeImpactReportPage from "./pages/TreeImpactReportPage";
 
 const queryClient = new QueryClient();
 
@@ -62,6 +64,22 @@ const App = () => (
               element={
                 <ProtectedRoute>
                   <ProjectReportPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/project/:projectId/tree-impact"
+              element={
+                <ProtectedRoute>
+                  <TreeImpactPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/project/:projectId/tree-impact-report"
+              element={
+                <ProtectedRoute>
+                  <TreeImpactReportPage />
                 </ProtectedRoute>
               }
             />

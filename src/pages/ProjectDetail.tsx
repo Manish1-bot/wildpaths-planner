@@ -20,7 +20,8 @@ import {
   Loader2,
   Play,
   Trash2,
-  Download
+  Download,
+  Trees
 } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 
@@ -113,6 +114,30 @@ export default function ProjectDetail() {
             )}
           </div>
         </div>
+
+        {/* Tree Impact Analysis Quick Link */}
+        <Card className="glass-card mb-6 border-green-500/30 bg-green-500/5">
+          <CardContent className="py-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="p-2 rounded-lg bg-green-500/10">
+                  <Trees className="h-5 w-5 text-green-500" />
+                </div>
+                <div>
+                  <h3 className="font-heading font-semibold">Tree Impact Analysis</h3>
+                  <p className="text-sm text-muted-foreground">
+                    Analyze environmental impact of development on tree coverage
+                  </p>
+                </div>
+              </div>
+              <Button asChild variant="outline" className="border-green-500/50 text-green-600 hover:bg-green-500/10">
+                <Link to={`/project/${project.id}/tree-impact`}>
+                  Open Module
+                </Link>
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
 
         {/* Tabs */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
