@@ -1,0 +1,21 @@
+id,species,latitude,longitude,date,observer,count,behavior
+1,Tiger,28.85,77.1,2024-01-15,Ranger A,1,hunting
+2,Tiger,28.87,77.12,2024-01-16,Ranger A,1,resting
+3,Elephant,28.65,77.4,2024-01-15,Ranger B,4,grazing
+4,Elephant,28.68,77.42,2024-01-17,Ranger B,6,moving
+5,Elephant,28.62,77.38,2024-01-18,Ranger C,3,drinking
+6,Leopard,28.72,77.35,2024-01-19,Ranger A,1,hunting
+7,Leopard,28.45,77.15,2024-01-20,Ranger C,1,resting
+8,Deer,28.88,77.08,2024-01-15,Ranger A,12,grazing
+9,Deer,28.86,77.11,2024-01-16,Ranger B,8,moving
+10,Deer,28.63,77.41,2024-01-17,Ranger B,15,grazing
+11,Tiger,28.7,77.32,2024-01-21,Ranger C,1,patrolling
+12,Wild Boar,28.42,77.18,2024-01-22,Ranger A,5,foraging
+13,Sambar,28.9,77.05,2024-01-23,Ranger B,3,grazing
+14,Sambar,28.67,77.45,2024-01-24,Ranger C,4,drinking
+15,Elephant,28.75,76.88,2024-01-25,Ranger A,8,moving
+16,Tiger,28.73,76.9,2024-01-26,Ranger B,1,marking
+17,Leopard,28.55,77.65,2024-01-27,Ranger C,1,hunting
+18,Deer,28.58,77.62,2024-01-28,Ranger A,20,grazing
+19,Nilgai,28.48,77.22,2024-01-29,Ranger B,6,grazing
+20,Nilgai,28.52,77.68,2024-01-30,Ranger C,4,moving

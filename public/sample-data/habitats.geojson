@@ -1,0 +1,70 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Northern Forest Reserve",
+        "type": "primary_habitat",
+        "area_sqkm": 45.2,
+        "status": "protected"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[[77.0, 28.8], [77.2, 28.8], [77.2, 28.95], [77.0, 28.95], [77.0, 28.8]]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Central Wildlife Sanctuary",
+        "type": "primary_habitat",
+        "area_sqkm": 62.8,
+        "status": "protected"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[[77.3, 28.6], [77.55, 28.6], [77.55, 28.75], [77.3, 28.75], [77.3, 28.6]]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Southern Forest Fragment",
+        "type": "secondary_habitat",
+        "area_sqkm": 18.5,
+        "status": "community_managed"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[[77.1, 28.4], [77.25, 28.4], [77.25, 28.5], [77.1, 28.5], [77.1, 28.4]]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Eastern Grassland",
+        "type": "secondary_habitat",
+        "area_sqkm": 22.3,
+        "status": "unprotected"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[[77.6, 28.5], [77.75, 28.5], [77.75, 28.6], [77.6, 28.6], [77.6, 28.5]]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Western Hills",
+        "type": "primary_habitat",
+        "area_sqkm": 35.7,
+        "status": "protected"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[[76.8, 28.65], [76.95, 28.65], [76.95, 28.8], [76.8, 28.8], [76.8, 28.65]]]
+      }
+    }
+  ]
+}

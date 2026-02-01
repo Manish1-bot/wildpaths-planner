@@ -1,0 +1,223 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* TerraByte - Geospatial Wildlife Corridor Planning System
+   Conservation-themed design system with glassmorphism effects
+   All colors MUST be HSL.
+*/
+
+@import url('https://fonts.googleapis.com/css2?family=Lato:wght@300;400;500;600;700&family=Roboto+Condensed:wght@400;500;600;700&display=swap');
+
+@layer base {
+  :root {
+    /* Primary - Forest Greens */
+    --primary: 146 50% 36%;
+    --primary-foreground: 0 0% 100%;
+    --primary-light: 147 47% 47%;
+    --primary-dark: 146 50% 28%;
+    
+    /* Secondary - Earth Tones */
+    --secondary: 25 59% 31%;
+    --secondary-foreground: 0 0% 100%;
+    --secondary-light: 28 74% 47%;
+    
+    /* Accent - Conservation Blues */
+    --accent: 210 79% 46%;
+    --accent-foreground: 0 0% 100%;
+    --accent-light: 207 44% 49%;
+    
+    /* Alert/Destructive - Reds */
+    --destructive: 16 100% 50%;
+    --destructive-foreground: 0 0% 100%;
+    --destructive-dark: 348 83% 47%;
+    
+    /* Background & Surfaces */
+    --background: 150 20% 97%;
+    --foreground: 150 20% 10%;
+    
+    --card: 0 0% 100%;
+    --card-foreground: 150 20% 10%;
+    
+    --popover: 0 0% 100%;
+    --popover-foreground: 150 20% 10%;
+    
+    /* Muted */
+    --muted: 150 15% 92%;
+    --muted-foreground: 150 10% 40%;
+    
+    /* Borders & Inputs */
+    --border: 150 15% 85%;
+    --input: 150 15% 85%;
+    --ring: 146 50% 36%;
+    
+    /* Radius */
+    --radius: 0.75rem;
+    
+    /* Sidebar */
+    --sidebar-background: 150 25% 15%;
+    --sidebar-foreground: 0 0% 95%;
+    --sidebar-primary: 147 47% 47%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 150 20% 25%;
+    --sidebar-accent-foreground: 0 0% 95%;
+    --sidebar-border: 150 15% 25%;
+    --sidebar-ring: 147 47% 47%;
+    
+    /* Zone Colors */
+    --zone-safe: 146 50% 40%;
+    --zone-risk: 0 70% 50%;
+    --zone-restoration: 45 90% 50%;
+    --zone-monitoring: 210 70% 50%;
+    
+    /* Glassmorphism */
+    --glass-background: 0 0% 100% / 0.7;
+    --glass-border: 0 0% 100% / 0.3;
+    --glass-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
+  }
+
+  .dark {
+    /* Primary - Forest Greens (adjusted for dark mode) */
+    --primary: 147 47% 47%;
+    --primary-foreground: 0 0% 100%;
+    --primary-light: 146 50% 55%;
+    --primary-dark: 146 50% 36%;
+    
+    /* Secondary - Earth Tones */
+    --secondary: 28 74% 47%;
+    --secondary-foreground: 0 0% 100%;
+    --secondary-light: 25 59% 55%;
+    
+    /* Accent - Conservation Blues */
+    --accent: 210 79% 56%;
+    --accent-foreground: 0 0% 100%;
+    --accent-light: 207 44% 59%;
+    
+    /* Alert/Destructive */
+    --destructive: 0 62.8% 50%;
+    --destructive-foreground: 0 0% 100%;
+    
+    /* Background & Surfaces */
+    --background: 150 20% 8%;
+    --foreground: 0 0% 95%;
+    
+    --card: 150 15% 12%;
+    --card-foreground: 0 0% 95%;
+    
+    --popover: 150 15% 12%;
+    --popover-foreground: 0 0% 95%;
+    
+    /* Muted */
+    --muted: 150 15% 18%;
+    --muted-foreground: 150 10% 60%;
+    
+    /* Borders & Inputs */
+    --border: 150 15% 25%;
+    --input: 150 15% 25%;
+    --ring: 147 47% 47%;
+    
+    /* Sidebar */
+    --sidebar-background: 150 25% 8%;
+    --sidebar-foreground: 0 0% 95%;
+    --sidebar-primary: 147 47% 47%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 150 20% 15%;
+    --sidebar-accent-foreground: 0 0% 95%;
+    --sidebar-border: 150 15% 20%;
+    --sidebar-ring: 147 47% 47%;
+    
+    /* Glassmorphism (dark) */
+    --glass-background: 150 20% 15% / 0.7;
+    --glass-border: 0 0% 100% / 0.1;
+    --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  html {
+    font-family: 'Lato', sans-serif;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Roboto Condensed', sans-serif;
+    font-weight: 600;
+  }
+}
+
+@layer components {
+  /* Glassmorphic Card */
+  .glass-card {
+    @apply rounded-xl border;
+    background: hsl(var(--glass-background));
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-color: hsl(var(--glass-border));
+    box-shadow: var(--glass-shadow);
+  }
+
+  /* Map Container */
+  .map-container {
+    @apply w-full h-full relative;
+  }
+
+  /* Zone overlays */
+  .zone-safe {
+    background-color: hsl(var(--zone-safe) / 0.3);
+    border-color: hsl(var(--zone-safe));
+  }
+
+  .zone-risk {
+    background-color: hsl(var(--zone-risk) / 0.3);
+    border-color: hsl(var(--zone-risk));
+  }
+
+  .zone-restoration {
+    background-color: hsl(var(--zone-restoration) / 0.3);
+    border-color: hsl(var(--zone-restoration));
+  }
+
+  .zone-monitoring {
+    background-color: hsl(var(--zone-monitoring) / 0.3);
+    border-color: hsl(var(--zone-monitoring));
+  }
+
+  /* Auth background gradient */
+  .auth-gradient {
+    background: linear-gradient(
+      135deg,
+      hsl(var(--primary-dark)) 0%,
+      hsl(var(--primary)) 50%,
+      hsl(var(--accent)) 100%
+    );
+  }
+
+  /* Scientific data table styling */
+  .data-table {
+    @apply w-full border-collapse;
+  }
+
+  .data-table th {
+    @apply bg-muted text-left px-4 py-2 font-semibold text-sm uppercase tracking-wider;
+  }
+
+  .data-table td {
+    @apply px-4 py-3 border-b border-border;
+  }
+}
+
+/* MapLibre overrides */
+.maplibregl-ctrl-group {
+  @apply rounded-lg shadow-lg;
+}
+
+.maplibregl-ctrl-group button {
+  @apply bg-card hover:bg-muted transition-colors;
+}
