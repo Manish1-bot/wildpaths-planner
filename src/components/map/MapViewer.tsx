@@ -128,7 +128,7 @@ export function MapViewer({
 
       const color = layer.color || '#22c55e';
 
-      // Add polygon layer
+      // Add polygon layer (both Polygon and MultiPolygon)
       if (hasPolygons) {
         map.current?.addLayer({
           id: layerId,
@@ -139,7 +139,7 @@ export function MapViewer({
             'fill-opacity': 0.4,
             'fill-outline-color': color,
           },
-          filter: ['any', ['==', '$type', 'Polygon'], ['==', '$type', 'MultiPolygon']],
+          filter: ['==', '$type', 'Polygon'],
         });
       }
 

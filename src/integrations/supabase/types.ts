@@ -254,6 +254,123 @@ export type Database = {
           },
         ]
       }
+      tree_analysis_results: {
+        Row: {
+          affected_geojson: Json | null
+          affected_trees: number
+          buffer_meters: number
+          created_at: string
+          development_dataset_id: string | null
+          id: string
+          project_id: string
+          safe_geojson: Json | null
+          safe_trees: number
+          summary: Json | null
+          total_trees: number
+          tree_loss_percentage: number
+          trees_dataset_id: string | null
+          user_id: string
+        }
+        Insert: {
+          affected_geojson?: Json | null
+          affected_trees: number
+          buffer_meters?: number
+          created_at?: string
+          development_dataset_id?: string | null
+          id?: string
+          project_id: string
+          safe_geojson?: Json | null
+          safe_trees: number
+          summary?: Json | null
+          total_trees: number
+          tree_loss_percentage: number
+          trees_dataset_id?: string | null
+          user_id: string
+        }
+        Update: {
+          affected_geojson?: Json | null
+          affected_trees?: number
+          buffer_meters?: number
+          created_at?: string
+          development_dataset_id?: string | null
+          id?: string
+          project_id?: string
+          safe_geojson?: Json | null
+          safe_trees?: number
+          summary?: Json | null
+          total_trees?: number
+          tree_loss_percentage?: number
+          trees_dataset_id?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tree_analysis_results_development_dataset_id_fkey"
+            columns: ["development_dataset_id"]
+            isOneToOne: false
+            referencedRelation: "tree_datasets"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tree_analysis_results_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tree_analysis_results_trees_dataset_id_fkey"
+            columns: ["trees_dataset_id"]
+            isOneToOne: false
+            referencedRelation: "tree_datasets"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      tree_datasets: {
+        Row: {
+          created_at: string
+          dataset_type: string
+          geojson_data: Json
+          id: string
+          metadata: Json | null
+          name: string
+          project_id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          dataset_type: string
+          geojson_data: Json
+          id?: string
+          metadata?: Json | null
+          name: string
+          project_id: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          dataset_type?: string
+          geojson_data?: Json
+          id?: string
+          metadata?: Json | null
+          name?: string
+          project_id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tree_datasets_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_roles: {
         Row: {
           created_at: string
