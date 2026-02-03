@@ -20,6 +20,8 @@ import Unauthorized from "./pages/Unauthorized";
 import NotFound from "./pages/NotFound";
 import TreeImpactPage from "./pages/TreeImpactPage";
 import TreeImpactReportPage from "./pages/TreeImpactReportPage";
+import CorridorPlanningPage from "./pages/CorridorPlanningPage";
+import TreeDataEntryPage from "./pages/TreeDataEntryPage";
 
 const queryClient = new QueryClient();
 
@@ -80,6 +82,22 @@ const App = () => (
               element={
                 <ProtectedRoute>
                   <TreeImpactReportPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/project/:projectId/corridor-planning"
+              element={
+                <ProtectedRoute>
+                  <CorridorPlanningPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/project/:projectId/tree-data-entry"
+              element={
+                <ProtectedRoute>
+                  <TreeDataEntryPage />
                 </ProtectedRoute>
               }
             />

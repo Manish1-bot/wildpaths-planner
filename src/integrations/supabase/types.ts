@@ -14,6 +14,59 @@ export type Database = {
   }
   public: {
     Tables: {
+      ai_detection_results: {
+        Row: {
+          confidence_score: number | null
+          created_at: string | null
+          detected_features: Json | null
+          detection_type: string
+          error_message: string | null
+          geojson_output: Json | null
+          id: string
+          image_url: string
+          metadata: Json | null
+          processing_status: string | null
+          project_id: string
+          user_id: string
+        }
+        Insert: {
+          confidence_score?: number | null
+          created_at?: string | null
+          detected_features?: Json | null
+          detection_type: string
+          error_message?: string | null
+          geojson_output?: Json | null
+          id?: string
+          image_url: string
+          metadata?: Json | null
+          processing_status?: string | null
+          project_id: string
+          user_id: string
+        }
+        Update: {
+          confidence_score?: number | null
+          created_at?: string | null
+          detected_features?: Json | null
+          detection_type?: string
+          error_message?: string | null
+          geojson_output?: Json | null
+          id?: string
+          image_url?: string
+          metadata?: Json | null
+          processing_status?: string | null
+          project_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ai_detection_results_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       analysis_results: {
         Row: {
           analysis_type: string
@@ -62,6 +115,45 @@ export type Database = {
           },
         ]
       }
+      audit_logs: {
+        Row: {
+          action: string
+          created_at: string | null
+          id: string
+          ip_address: string | null
+          new_data: Json | null
+          old_data: Json | null
+          record_id: string | null
+          table_name: string
+          user_agent: string | null
+          user_id: string | null
+        }
+        Insert: {
+          action: string
+          created_at?: string | null
+          id?: string
+          ip_address?: string | null
+          new_data?: Json | null
+          old_data?: Json | null
+          record_id?: string | null
+          table_name: string
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          action?: string
+          created_at?: string | null
+          id?: string
+          ip_address?: string | null
+          new_data?: Json | null
+          old_data?: Json | null
+          record_id?: string | null
+          table_name?: string
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       corridor_designs: {
         Row: {
           created_at: string
@@ -96,6 +188,71 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "corridor_designs_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      corridor_observations: {
+        Row: {
+          connectivity_notes: string | null
+          corridor_type: string | null
+          created_at: string | null
+          description: string | null
+          geojson_data: Json
+          id: string
+          metadata: Json | null
+          name: string
+          priority: string | null
+          project_id: string
+          risk_factors: string[] | null
+          status: string | null
+          target_species: string[] | null
+          updated_at: string | null
+          user_id: string
+          width_meters: number | null
+        }
+        Insert: {
+          connectivity_notes?: string | null
+          corridor_type?: string | null
+          created_at?: string | null
+          description?: string | null
+          geojson_data: Json
+          id?: string
+          metadata?: Json | null
+          name: string
+          priority?: string | null
+          project_id: string
+          risk_factors?: string[] | null
+          status?: string | null
+          target_species?: string[] | null
+          updated_at?: string | null
+          user_id: string
+          width_meters?: number | null
+        }
+        Update: {
+          connectivity_notes?: string | null
+          corridor_type?: string | null
+          created_at?: string | null
+          description?: string | null
+          geojson_data?: Json
+          id?: string
+          metadata?: Json | null
+          name?: string
+          priority?: string | null
+          project_id?: string
+          risk_factors?: string[] | null
+          status?: string | null
+          target_species?: string[] | null
+          updated_at?: string | null
+          user_id?: string
+          width_meters?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "corridor_observations_project_id_fkey"
             columns: ["project_id"]
             isOneToOne: false
             referencedRelation: "projects"
@@ -143,6 +300,127 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "datasets_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      field_observations: {
+        Row: {
+          created_at: string | null
+          description: string | null
+          habitat_type: string | null
+          id: string
+          infrastructure_type: string | null
+          latitude: number
+          longitude: number
+          metadata: Json | null
+          observation_type: string
+          photo_urls: string[] | null
+          project_id: string
+          risk_level: string | null
+          species_observed: string[] | null
+          title: string
+          updated_at: string | null
+          user_id: string
+          verified: boolean | null
+          verified_by: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          description?: string | null
+          habitat_type?: string | null
+          id?: string
+          infrastructure_type?: string | null
+          latitude: number
+          longitude: number
+          metadata?: Json | null
+          observation_type: string
+          photo_urls?: string[] | null
+          project_id: string
+          risk_level?: string | null
+          species_observed?: string[] | null
+          title: string
+          updated_at?: string | null
+          user_id: string
+          verified?: boolean | null
+          verified_by?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          description?: string | null
+          habitat_type?: string | null
+          id?: string
+          infrastructure_type?: string | null
+          latitude?: number
+          longitude?: number
+          metadata?: Json | null
+          observation_type?: string
+          photo_urls?: string[] | null
+          project_id?: string
+          risk_level?: string | null
+          species_observed?: string[] | null
+          title?: string
+          updated_at?: string | null
+          user_id?: string
+          verified?: boolean | null
+          verified_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "field_observations_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      google_form_imports: {
+        Row: {
+          created_at: string | null
+          error_log: Json | null
+          failed_count: number | null
+          form_type: string
+          id: string
+          import_source: string
+          processed_count: number | null
+          project_id: string
+          raw_data: Json
+          status: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          error_log?: Json | null
+          failed_count?: number | null
+          form_type: string
+          id?: string
+          import_source: string
+          processed_count?: number | null
+          project_id: string
+          raw_data: Json
+          status?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          error_log?: Json | null
+          failed_count?: number | null
+          form_type?: string
+          id?: string
+          import_source?: string
+          processed_count?: number | null
+          project_id?: string
+          raw_data?: Json
+          status?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "google_form_imports_project_id_fkey"
             columns: ["project_id"]
             isOneToOne: false
             referencedRelation: "projects"
@@ -364,6 +642,83 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "tree_datasets_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      tree_observations: {
+        Row: {
+          age_years: number | null
+          canopy_diameter_meters: number | null
+          created_at: string | null
+          health_status: string | null
+          height_meters: number | null
+          id: string
+          impact_reason: string | null
+          impact_status: string | null
+          latitude: number
+          longitude: number
+          metadata: Json | null
+          notes: string | null
+          observation_date: string | null
+          photo_urls: string[] | null
+          project_id: string
+          species: string | null
+          tree_id: string | null
+          trunk_diameter_cm: number | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          age_years?: number | null
+          canopy_diameter_meters?: number | null
+          created_at?: string | null
+          health_status?: string | null
+          height_meters?: number | null
+          id?: string
+          impact_reason?: string | null
+          impact_status?: string | null
+          latitude: number
+          longitude: number
+          metadata?: Json | null
+          notes?: string | null
+          observation_date?: string | null
+          photo_urls?: string[] | null
+          project_id: string
+          species?: string | null
+          tree_id?: string | null
+          trunk_diameter_cm?: number | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          age_years?: number | null
+          canopy_diameter_meters?: number | null
+          created_at?: string | null
+          health_status?: string | null
+          height_meters?: number | null
+          id?: string
+          impact_reason?: string | null
+          impact_status?: string | null
+          latitude?: number
+          longitude?: number
+          metadata?: Json | null
+          notes?: string | null
+          observation_date?: string | null
+          photo_urls?: string[] | null
+          project_id?: string
+          species?: string | null
+          tree_id?: string | null
+          trunk_diameter_cm?: number | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tree_observations_project_id_fkey"
             columns: ["project_id"]
             isOneToOne: false
             referencedRelation: "projects"
