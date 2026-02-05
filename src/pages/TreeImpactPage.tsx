@@ -5,6 +5,7 @@ import { TreeDataUploader } from '@/components/tree-impact/TreeDataUploader';
 import { TreeImpactAnalysisPanel } from '@/components/tree-impact/TreeImpactAnalysisPanel';
 import { TreeImpactResults } from '@/components/tree-impact/TreeImpactResults';
 import { TreeImpactMap } from '@/components/tree-impact/TreeImpactMap';
+import { AnalyticsDashboard } from '@/components/analytics/AnalyticsDashboard';
 import { useProject } from '@/hooks/useProjects';
 import { useTreeDatasets, useTreeAnalysisResults } from '@/hooks/useTreeImpactAnalysis';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
@@ -20,7 +21,8 @@ import {
   Loader2,
   Download,
   Trees,
-  AlertTriangle
+  AlertTriangle,
+  PieChart
 } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 
@@ -140,19 +142,19 @@ export default function TreeImpactPage() {
         {/* Tabs */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
           <TabsList className="grid grid-cols-4 w-full max-w-lg">
-            <TabsTrigger value="upload" className="flex items-center gap-2">
+            <TabsTrigger value="upload" className="flex items-center gap-1.5">
               <Upload className="h-4 w-4" />
               <span className="hidden sm:inline">Upload</span>
             </TabsTrigger>
-            <TabsTrigger value="analyze" className="flex items-center gap-2">
+            <TabsTrigger value="analyze" className="flex items-center gap-1.5">
               <BarChart3 className="h-4 w-4" />
               <span className="hidden sm:inline">Analyze</span>
             </TabsTrigger>
-            <TabsTrigger value="map" className="flex items-center gap-2">
+            <TabsTrigger value="map" className="flex items-center gap-1.5">
               <Map className="h-4 w-4" />
               <span className="hidden sm:inline">Map</span>
             </TabsTrigger>
-            <TabsTrigger value="results" className="flex items-center gap-2">
+            <TabsTrigger value="results" className="flex items-center gap-1.5">
               <FileText className="h-4 w-4" />
               <span className="hidden sm:inline">Results</span>
             </TabsTrigger>
@@ -226,6 +228,39 @@ export default function TreeImpactPage() {
             ) : latestResult ? (
               <div className="space-y-6">
                 <TreeImpactResults result={latestResult} />
+
+                {/* Analytics Dashboard */}
+                <Card className="glass-card">
+                  <CardHeader>
+                    <CardTitle className="font-heading flex items-center gap-2">
+                      <PieChart className="h-5 w-5 text-primary" />
+                      Impact Analytics
+                    </CardTitle>
+                    <CardDescription>
+                      Visual breakdown of tree impact analysis
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <AnalyticsDashboard
+                      treeData={{
+                        total: latestResult.total_trees,
+                        affected: latestResult.affected_trees,
+                        safe: latestResult.safe_trees,
+                        bySpecies: latestResult.summary?.speciesBreakdown 
+                          ? Object.entries(latestResult.summary.speciesBreakdown as Record<string, number>)
+                          : [],
+                        byHealth: latestResult.summary?.healthBreakdown
+                          ? Object.entries(latestResult.summary.healthBreakdown as Record<string, number>)
+                          : [],
+                        byImpact: [
+                          ['safe', latestResult.safe_trees],
+                          ['affected', latestResult.affected_trees],
+                        ],
+                      }}
+                      type="tree"
+                    />
+                  </CardContent>
+                </Card>
                 
                 {/* Generate Report Button */}
                 <Card className="glass-card">

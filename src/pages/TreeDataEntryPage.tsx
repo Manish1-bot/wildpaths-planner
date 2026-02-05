@@ -30,6 +30,8 @@ import {
   Upload as UploadIcon
 } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
+import { useDropzone } from 'react-dropzone';
+import { useGoogleFormImport } from '@/hooks/useGoogleFormImport';
 
 export default function TreeDataEntryPage() {
   const { projectId } = useParams<{ projectId: string }>();
@@ -50,6 +52,21 @@ export default function TreeDataEntryPage() {
   const [filterSpecies, setFilterSpecies] = useState<string>('all');
   const [filterHealth, setFilterHealth] = useState<string>('all');
   const [filterImpact, setFilterImpact] = useState<string>('all');
+  const { importTreeCSV, isImporting } = useGoogleFormImport(projectId);
+
+  const { getRootProps, getInputProps, isDragActive } = useDropzone({
+    accept: { 'text/csv': ['.csv'] },
+    maxFiles: 1,
+    onDrop: async (files) => {
+      if (files.length > 0) {
+        try {
+          await importTreeCSV(files[0]);
+        } catch (error) {
+          console.error('Import error:', error);
+        }
+      }
+    },
+  });
 
   if (projectLoading) {
     return (
@@ -411,10 +428,18 @@ export default function TreeDataEntryPage() {
               </CardHeader>
               <CardContent className="space-y-6">
                 {/* Google Form Integration */}
-                <div className="p-6 rounded-lg border-2 border-dashed">
+                <div 
+                  {...getRootProps()}
+                  className={`p-6 rounded-lg border-2 border-dashed transition-colors cursor-pointer ${
+                    isDragActive ? 'border-primary bg-primary/5' : 'border-muted-foreground/25 hover:border-primary/50'
+                  }`}
+                >
+                  <input {...getInputProps()} />
                   <h4 className="font-medium mb-2">Google Form Integration</h4>
                   <p className="text-sm text-muted-foreground mb-4">
-                    Export your Google Form responses as CSV and import them here
+                    {isDragActive 
+                      ? 'Drop the CSV file here...' 
+                      : 'Drag and drop a CSV file here, or click to select'}
                   </p>
                   <ol className="text-sm text-muted-foreground space-y-2 mb-4">
                     <li>1. Create a Google Form with fields: Latitude, Longitude, Species, Height, Age, Health</li>
@@ -422,9 +447,18 @@ export default function TreeDataEntryPage() {
                     <li>3. Download responses as CSV from Google Sheets</li>
                     <li>4. Upload the CSV file below</li>
                   </ol>
-                  <Button variant="outline">
-                    <UploadIcon className="h-4 w-4 mr-2" />
-                    Upload CSV from Google Forms
+                  <Button variant="outline" disabled={isImporting}>
+                    {isImporting ? (
+                      <>
+                        <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                        Importing...
+                      </>
+                    ) : (
+                      <>
+                        <UploadIcon className="h-4 w-4 mr-2" />
+                        Select CSV File
+                      </>
+                    )}
                   </Button>
                 </div>
 
@@ -437,6 +471,27 @@ export default function TreeDataEntryPage() {
                   <code className="text-xs bg-muted p-2 rounded block">
                     latitude,longitude,species,height_meters,age_years,health_status,notes
                   </code>
+                  <p className="text-sm text-muted-foreground mt-4">
+                    <strong>Tip:</strong> Column names are flexible - the system recognizes variations like 
+                    'lat/latitude', 'lng/longitude/long', 'height/height_m', 'age/age_years', etc.
+                  </p>
+                </div>
+
+                {/* Webhook Info */}
+                <div className="p-6 rounded-lg bg-primary/5 border border-primary/20">
+                  <h4 className="font-medium mb-2 flex items-center gap-2">
+                    <AlertTriangle className="h-4 w-4 text-primary" />
+                    API Webhook (Advanced)
+                  </h4>
+                  <p className="text-sm text-muted-foreground mb-2">
+                    For automated imports, send POST requests to:
+                  </p>
+                  <code className="text-xs bg-muted p-2 rounded block break-all">
+                    {import.meta.env.VITE_SUPABASE_URL}/functions/v1/google-form-webhook
+                  </code>
+                  <p className="text-xs text-muted-foreground mt-2">
+                    Body: {'{'} formType: "tree_observation", projectId: "...", userId: "...", responses: [...] {'}'}
+                  </p>
                 </div>
               </CardContent>
             </Card>

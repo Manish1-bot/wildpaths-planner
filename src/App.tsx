@@ -22,6 +22,7 @@ import TreeImpactPage from "./pages/TreeImpactPage";
 import TreeImpactReportPage from "./pages/TreeImpactReportPage";
 import CorridorPlanningPage from "./pages/CorridorPlanningPage";
 import TreeDataEntryPage from "./pages/TreeDataEntryPage";
+import SecurityAuditPage from "./pages/SecurityAuditPage";
 
 const queryClient = new QueryClient();
 
@@ -122,6 +123,14 @@ const App = () => (
               element={
                 <ProtectedRoute>
                   <UploadPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/security-audit"
+              element={
+                <ProtectedRoute>
+                  <SecurityAuditPage />
                 </ProtectedRoute>
               }
             />

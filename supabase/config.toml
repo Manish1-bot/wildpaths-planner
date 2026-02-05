@@ -1,1 +1,13 @@
 project_id = "kmvqgjgnebqmeatpzsux"
+
+[functions.ai-tree-detection]
+verify_jwt = true
+
+[functions.ai-tree-analysis]
+verify_jwt = true
+
+[functions.analyze-corridor]
+verify_jwt = true
+
+[functions.google-form-webhook]
+verify_jwt = false
