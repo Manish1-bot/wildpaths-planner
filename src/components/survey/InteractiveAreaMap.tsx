@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, useCallback } from 'react';
+import { useEffect, useRef, useState, useCallback, forwardRef, useImperativeHandle } from 'react';
 import maplibregl from 'maplibre-gl';
 import 'maplibre-gl/dist/maplibre-gl.css';
 import * as turf from '@turf/turf';
@@ -11,19 +11,28 @@ interface InteractiveAreaMapProps {
   drawingMode: DrawingMode;
   onAreaDrawn: (polygon: GeoJSON.Feature<GeoJSON.Polygon>, details: AreaDetails) => void;
   onMeasurement?: (distanceM: number) => void;
+  onMapClick?: (coords: [number, number]) => void;
   drawnArea?: GeoJSON.Feature<GeoJSON.Polygon> | null;
+  treeMarkers?: Array<{ id: string; coordinates: [number, number]; species?: string }>;
   className?: string;
 }
 
-export function InteractiveAreaMap({
+export interface InteractiveAreaMapRef {
+  clearDrawing: () => void;
+  flyTo: (center: [number, number], zoom: number) => void;
+}
+
+export const InteractiveAreaMap = forwardRef<InteractiveAreaMapRef, InteractiveAreaMapProps>(({
   center = [78.9629, 20.5937],
   zoom = 5,
   drawingMode,
   onAreaDrawn,
   onMeasurement,
+  onMapClick,
   drawnArea,
+  treeMarkers = [],
   className = '',
-}: InteractiveAreaMapProps) {
+}, ref) => {
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<maplibregl.Map | null>(null);
   const [mapLoaded, setMapLoaded] = useState(false);
@@ -32,6 +41,33 @@ export function InteractiveAreaMap({
   const drawPoints = useRef<[number, number][]>([]);
   const startPoint = useRef<[number, number] | null>(null);
   const isDragging = useRef(false);
+  const markersRef = useRef<maplibregl.Marker[]>([]);
+
+  // Expose methods via ref
+  useImperativeHandle(ref, () => ({
+    clearDrawing: () => {
+      if (!map.current) return;
+      
+      const drawingSource = map.current.getSource('drawing') as maplibregl.GeoJSONSource;
+      const previewSource = map.current.getSource('preview') as maplibregl.GeoJSONSource;
+      
+      if (drawingSource) {
+        drawingSource.setData({ type: 'FeatureCollection', features: [] });
+      }
+      if (previewSource) {
+        previewSource.setData({ type: 'FeatureCollection', features: [] });
+      }
+      
+      drawPoints.current = [];
+      startPoint.current = null;
+      isDragging.current = false;
+    },
+    flyTo: (newCenter: [number, number], newZoom: number) => {
+      if (map.current) {
+        map.current.flyTo({ center: newCenter, zoom: newZoom, duration: 1500 });
+      }
+    },
+  }), []);
 
   // Initialize map
   useEffect(() => {
@@ -70,33 +106,40 @@ export function InteractiveAreaMap({
     map.current.addControl(new maplibregl.ScaleControl({ unit: 'metric' }), 'bottom-left');
 
     map.current.on('load', () => {
-      setMapLoaded(true);
+      if (!map.current) return;
       
-      // Add drawing layers
-      map.current?.addSource('drawing', {
+      // Add drawing source with empty FeatureCollection
+      map.current.addSource('drawing', {
         type: 'geojson',
         data: { type: 'FeatureCollection', features: [] },
       });
 
-      map.current?.addSource('preview', {
+      // Add preview source
+      map.current.addSource('preview', {
         type: 'geojson',
         data: { type: 'FeatureCollection', features: [] },
       });
 
-      // Filled area layer
-      map.current?.addLayer({
+      // Add tree markers source
+      map.current.addSource('tree-markers', {
+        type: 'geojson',
+        data: { type: 'FeatureCollection', features: [] },
+      });
+
+      // Drawing fill layer - GREEN for final drawn area
+      map.current.addLayer({
         id: 'drawing-fill',
         type: 'fill',
         source: 'drawing',
         paint: {
           'fill-color': '#22c55e',
-          'fill-opacity': 0.3,
+          'fill-opacity': 0.35,
         },
         filter: ['==', '$type', 'Polygon'],
       });
 
-      // Outline layer
-      map.current?.addLayer({
+      // Drawing outline layer
+      map.current.addLayer({
         id: 'drawing-line',
         type: 'line',
         source: 'drawing',
@@ -106,19 +149,20 @@ export function InteractiveAreaMap({
         },
       });
 
-      // Preview layer for drawing in progress
-      map.current?.addLayer({
+      // Preview fill layer - BLUE for drawing in progress
+      map.current.addLayer({
         id: 'preview-fill',
         type: 'fill',
         source: 'preview',
         paint: {
           'fill-color': '#3b82f6',
-          'fill-opacity': 0.2,
+          'fill-opacity': 0.25,
         },
         filter: ['==', '$type', 'Polygon'],
       });
 
-      map.current?.addLayer({
+      // Preview line layer
+      map.current.addLayer({
         id: 'preview-line',
         type: 'line',
         source: 'preview',
@@ -129,7 +173,8 @@ export function InteractiveAreaMap({
         },
       });
 
-      map.current?.addLayer({
+      // Preview points layer
+      map.current.addLayer({
         id: 'preview-points',
         type: 'circle',
         source: 'preview',
@@ -141,9 +186,27 @@ export function InteractiveAreaMap({
         },
         filter: ['==', '$type', 'Point'],
       });
+
+      // Tree marker layer
+      map.current.addLayer({
+        id: 'tree-markers-layer',
+        type: 'circle',
+        source: 'tree-markers',
+        paint: {
+          'circle-radius': 8,
+          'circle-color': '#22c55e',
+          'circle-stroke-width': 2,
+          'circle-stroke-color': '#ffffff',
+        },
+      });
+
+      setMapLoaded(true);
     });
 
     return () => {
+      // Clean up markers
+      markersRef.current.forEach(m => m.remove());
+      markersRef.current = [];
       map.current?.remove();
       map.current = null;
     };
@@ -155,19 +218,56 @@ export function InteractiveAreaMap({
     map.current.flyTo({ center, zoom: Math.max(zoom, 14), duration: 1500 });
   }, [center, zoom, mapLoaded]);
 
-  // Update drawn area display
+  // Update drawn area display - THIS IS THE FIX for visibility
   useEffect(() => {
     if (!map.current || !mapLoaded) return;
+    
     const source = map.current.getSource('drawing') as maplibregl.GeoJSONSource;
-    if (source && drawnArea) {
+    if (!source) return;
+    
+    if (drawnArea) {
+      // Set the drawn area GeoJSON
       source.setData({
         type: 'FeatureCollection',
         features: [drawnArea],
       });
-    } else if (source) {
+      
+      // Fit bounds to show the drawn area
+      try {
+        const bbox = turf.bbox(drawnArea);
+        map.current.fitBounds(
+          [[bbox[0], bbox[1]], [bbox[2], bbox[3]]],
+          { padding: 50, maxZoom: 18 }
+        );
+      } catch (e) {
+        console.error('Error fitting bounds:', e);
+      }
+    } else {
       source.setData({ type: 'FeatureCollection', features: [] });
     }
   }, [drawnArea, mapLoaded]);
+
+  // Update tree markers
+  useEffect(() => {
+    if (!map.current || !mapLoaded) return;
+    
+    const source = map.current.getSource('tree-markers') as maplibregl.GeoJSONSource;
+    if (!source) return;
+    
+    const features = treeMarkers.map(marker => ({
+      type: 'Feature' as const,
+      properties: { id: marker.id, species: marker.species },
+      geometry: {
+        type: 'Point' as const,
+        coordinates: marker.coordinates,
+      },
+    }));
+    
+    source.setData({
+      type: 'FeatureCollection',
+      features,
+    });
+  }, [treeMarkers, mapLoaded]);
 
   // Handle drawing mode changes
   useEffect(() => {
@@ -178,11 +278,7 @@ export function InteractiveAreaMap({
     switch (drawingMode) {
       case 'rectangle':
       case 'circle':
-        canvas.style.cursor = 'crosshair';
-        break;
       case 'polygon':
-        canvas.style.cursor = 'crosshair';
-        break;
       case 'measure':
         canvas.style.cursor = 'crosshair';
         break;
@@ -205,7 +301,11 @@ export function InteractiveAreaMap({
     if (!map.current || !mapLoaded) return;
 
     const handleMouseDown = (e: maplibregl.MapMouseEvent) => {
-      if (drawingMode === 'select') return;
+      if (drawingMode === 'select') {
+        // Handle click for tree placement in select mode
+        onMapClick?.([e.lngLat.lng, e.lngLat.lat]);
+        return;
+      }
       
       const coords: [number, number] = [e.lngLat.lng, e.lngLat.lat];
       
@@ -235,6 +335,11 @@ export function InteractiveAreaMap({
     };
 
     const handleClick = (e: maplibregl.MapMouseEvent) => {
+      if (drawingMode === 'select') {
+        onMapClick?.([e.lngLat.lng, e.lngLat.lat]);
+        return;
+      }
+      
       if (drawingMode !== 'polygon' && drawingMode !== 'measure') return;
       
       const coords: [number, number] = [e.lngLat.lng, e.lngLat.lat];
@@ -265,7 +370,7 @@ export function InteractiveAreaMap({
       map.current?.off('click', handleClick);
       map.current?.off('dblclick', handleDblClick);
     };
-  }, [drawingMode, mapLoaded, onAreaDrawn, onMeasurement]);
+  }, [drawingMode, mapLoaded, onAreaDrawn, onMeasurement, onMapClick]);
 
   const updatePreview = (start: [number, number], current: [number, number]) => {
     if (!map.current) return;
@@ -283,7 +388,11 @@ export function InteractiveAreaMap({
       ]);
     } else if (drawingMode === 'circle') {
       const radiusKm = turf.distance(turf.point(start), turf.point(current), { units: 'kilometers' });
-      previewFeature = turf.circle(start, radiusKm, { units: 'kilometers', steps: 64 });
+      if (radiusKm > 0) {
+        previewFeature = turf.circle(start, radiusKm, { units: 'kilometers', steps: 64 });
+      } else {
+        return;
+      }
     } else {
       return;
     }
@@ -332,6 +441,7 @@ export function InteractiveAreaMap({
       details = calculateRectangleArea(start, end);
     } else if (drawingMode === 'circle') {
       const radiusM = turf.distance(turf.point(start), turf.point(end), { units: 'meters' });
+      if (radiusM < 1) return; // Too small
       polygon = turf.circle(start, radiusM / 1000, { units: 'kilometers', steps: 64 }) as GeoJSON.Feature<GeoJSON.Polygon>;
       details = calculateCircleArea(start, radiusM);
     } else {
@@ -342,6 +452,15 @@ export function InteractiveAreaMap({
     const previewSource = map.current?.getSource('preview') as maplibregl.GeoJSONSource;
     if (previewSource) {
       previewSource.setData({ type: 'FeatureCollection', features: [] });
+    }
+
+    // Update drawing source immediately to show the shape
+    const drawingSource = map.current?.getSource('drawing') as maplibregl.GeoJSONSource;
+    if (drawingSource) {
+      drawingSource.setData({
+        type: 'FeatureCollection',
+        features: [polygon],
+      });
     }
 
     onAreaDrawn(polygon, details);
@@ -360,31 +479,21 @@ export function InteractiveAreaMap({
       previewSource.setData({ type: 'FeatureCollection', features: [] });
     }
 
+    // Update drawing source immediately to show the shape
+    const drawingSource = map.current?.getSource('drawing') as maplibregl.GeoJSONSource;
+    if (drawingSource) {
+      drawingSource.setData({
+        type: 'FeatureCollection',
+        features: [polygon],
+      });
+    }
+
     if (drawingMode === 'measure') {
       onMeasurement?.(details.perimeterM);
     } else {
       onAreaDrawn(polygon, details);
     }
   };
-
-  // Public method to clear the map
-  const clearDrawing = useCallback(() => {
-    if (!map.current) return;
-    
-    const drawingSource = map.current.getSource('drawing') as maplibregl.GeoJSONSource;
-    const previewSource = map.current.getSource('preview') as maplibregl.GeoJSONSource;
-    
-    if (drawingSource) {
-      drawingSource.setData({ type: 'FeatureCollection', features: [] });
-    }
-    if (previewSource) {
-      previewSource.setData({ type: 'FeatureCollection', features: [] });
-    }
-    
-    drawPoints.current = [];
-    startPoint.current = null;
-    isDragging.current = false;
-  }, []);
 
   return (
     <div className={`relative w-full h-full min-h-[500px] ${className}`}>
@@ -403,6 +512,17 @@ export function InteractiveAreaMap({
           </div>
         </div>
       )}
+      
+      {/* Tree count indicator */}
+      {treeMarkers.length > 0 && (
+        <div className="absolute top-4 left-4 z-10">
+          <div className="bg-green-500 text-white px-3 py-1.5 rounded-full text-sm font-medium shadow-lg">
+            🌳 {treeMarkers.length} trees
+          </div>
+        </div>
+      )}
     </div>
   );
-}
+});
+
+InteractiveAreaMap.displayName = 'InteractiveAreaMap';

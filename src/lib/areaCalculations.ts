@@ -104,7 +104,50 @@ export function createRectanglePolygon(corner1: [number, number], corner2: [numb
 }
 
 /**
- * Create grid cells for sampling
+ * Grid cell interface for sampling
+ */
+export interface GridCell {
+  id: string;
+  index: number;
+  polygon: GeoJSON.Feature<GeoJSON.Polygon>;
+  center: [number, number];
+  isSampleCell: boolean;
+}
+
+/**
+ * Generate grid cells for sampling
+ */
+export function generateGridCells(
+  polygon: GeoJSON.Feature<GeoJSON.Polygon>,
+  cellSizeM: number = 50
+): GridCell[] {
+  const bbox = turf.bbox(polygon);
+  const cellSizeKm = cellSizeM / 1000;
+  const grid = turf.squareGrid(bbox, cellSizeKm, { units: 'kilometers' });
+  
+  // Filter cells that intersect with the polygon
+  const cells: GridCell[] = [];
+  let cellIndex = 0;
+  
+  turf.featureEach(grid, (cell) => {
+    if (turf.booleanIntersects(cell, polygon)) {
+      cellIndex++;
+      const centroid = turf.centroid(cell);
+      cells.push({
+        id: `cell-${cellIndex}`,
+        index: cellIndex,
+        polygon: cell as GeoJSON.Feature<GeoJSON.Polygon>,
+        center: centroid.geometry.coordinates as [number, number],
+        isSampleCell: cellIndex % 5 === 0, // Every 5th cell for 20% sample
+      });
+    }
+  });
+
+  return cells;
+}
+
+/**
+ * Create grid cells for sampling (legacy function)
  */
 export function createSamplingGrid(
   polygon: GeoJSON.Feature<GeoJSON.Polygon>,
