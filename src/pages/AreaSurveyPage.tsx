@@ -1,31 +1,30 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useRef } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { AppHeader } from '@/components/layout/AppHeader';
 import { AddressSearch } from '@/components/survey/AddressSearch';
 import { AreaDrawingTools, DrawingMode } from '@/components/survey/AreaDrawingTools';
 import { AreaSummary } from '@/components/survey/AreaSummary';
-import { InteractiveAreaMap } from '@/components/survey/InteractiveAreaMap';
-import { TreeQuickForm } from '@/components/survey/TreeQuickForm';
-import { GridSamplingPanel } from '@/components/survey/GridSamplingPanel';
+import { InteractiveAreaMap, InteractiveAreaMapRef } from '@/components/survey/InteractiveAreaMap';
+import { EnhancedTreeQuickForm, TreeFormData } from '@/components/survey/EnhancedTreeQuickForm';
+import { EnhancedGridSamplingPanel } from '@/components/survey/EnhancedGridSamplingPanel';
 import { AITreeDetection } from '@/components/tree-impact/AITreeDetection';
 import { useProject } from '@/hooks/useProjects';
 import { useTreeObservations } from '@/hooks/useTreeObservations';
-import { GeocodingResult, detectLandType, recommendSurveyMethod } from '@/lib/geocoding';
+import { GeocodingResult, detectLandType } from '@/lib/geocoding';
 import { AreaDetails } from '@/lib/areaCalculations';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { 
   ArrowLeft, 
-  MapPin, 
   Loader2, 
   Trees, 
   Grid3x3, 
   Satellite,
   ChevronRight,
   Check,
-  RotateCcw
+  RotateCcw,
+  MapPin
 } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -36,7 +35,8 @@ export default function AreaSurveyPage() {
   const { projectId } = useParams<{ projectId: string }>();
   const navigate = useNavigate();
   const { data: project, isLoading: projectLoading } = useProject(projectId);
-  const { createTree } = useTreeObservations(projectId);
+  const { createTree, trees } = useTreeObservations(projectId);
+  const mapRef = useRef<InteractiveAreaMapRef>(null);
 
   // Wizard state
   const [step, setStep] = useState<WizardStep>('location');
@@ -53,6 +53,13 @@ export default function AreaSurveyPage() {
   const [surveyMethod, setSurveyMethod] = useState<SurveyMethod | null>(null);
   const [addingTreeAt, setAddingTreeAt] = useState<[number, number] | null>(null);
   const [treeCount, setTreeCount] = useState(0);
+  
+  // Tree markers for the map
+  const treeMarkers = trees?.map(t => ({
+    id: t.id,
+    coordinates: [t.longitude, t.latitude] as [number, number],
+    species: t.species || undefined,
+  })) || [];
 
   // Handle location selection
   const handleLocationSelect = useCallback((result: GeocodingResult) => {
@@ -86,7 +93,7 @@ export default function AreaSurveyPage() {
         setStep('draw');
         toast.success('Using your current location');
       },
-      (error) => {
+      () => {
         toast.error('Could not get your location. Please search manually.');
       }
     );
@@ -106,8 +113,15 @@ export default function AreaSurveyPage() {
     setStep('survey');
   }, []);
 
+  // Handle map click for tree placement
+  const handleMapClick = useCallback((coords: [number, number]) => {
+    if (step === 'survey' && surveyMethod === 'detailed') {
+      setAddingTreeAt(coords);
+    }
+  }, [step, surveyMethod]);
+
   // Handle tree creation
-  const handleTreeSubmit = useCallback(async (data: any) => {
+  const handleTreeSubmit = useCallback(async (data: TreeFormData) => {
     try {
       await createTree.mutateAsync(data);
       setTreeCount(prev => prev + 1);
@@ -119,7 +133,7 @@ export default function AreaSurveyPage() {
   }, [createTree, treeCount]);
 
   // Handle save and continue
-  const handleSaveAndContinue = useCallback(async (data: any) => {
+  const handleSaveAndContinue = useCallback(async (data: TreeFormData) => {
     try {
       await createTree.mutateAsync(data);
       setTreeCount(prev => prev + 1);
@@ -141,6 +155,14 @@ export default function AreaSurveyPage() {
     setDrawingMode('select');
     setMapCenter([78.9629, 20.5937]);
     setMapZoom(5);
+    mapRef.current?.clearDrawing();
+  }, []);
+
+  // Clear drawn area
+  const handleClearDrawing = useCallback(() => {
+    setDrawnArea(null);
+    setAreaDetails(null);
+    mapRef.current?.clearDrawing();
   }, []);
 
   if (projectLoading) {
@@ -156,7 +178,7 @@ export default function AreaSurveyPage() {
     );
   }
 
-  if (!project) {
+  if (!project || !projectId) {
     return (
       <div className="min-h-screen bg-background">
         <AppHeader />
@@ -251,15 +273,8 @@ export default function AreaSurveyPage() {
                 <AreaDrawingTools
                   mode={drawingMode}
                   onModeChange={setDrawingMode}
-                  onClear={() => {
-                    setDrawnArea(null);
-                    setAreaDetails(null);
-                  }}
-                  onComplete={() => {
-                    if (areaDetails) {
-                      // Stay on draw step to show area summary and method selection
-                    }
-                  }}
+                  onClear={handleClearDrawing}
+                  onComplete={() => {}}
                   hasDrawing={!!drawnArea}
                   isDrawing={drawingMode !== 'select'}
                 />
@@ -290,9 +305,12 @@ export default function AreaSurveyPage() {
                     <p className="text-sm text-muted-foreground">trees recorded</p>
                   </div>
                   
-                  <p className="text-sm text-muted-foreground">
-                    💡 Click on the map to add tree locations. Each click opens a form to record details.
-                  </p>
+                  <div className="p-3 rounded-lg bg-muted/50">
+                    <div className="flex items-center gap-2 text-sm">
+                      <MapPin className="h-4 w-4 text-primary" />
+                      <span>Click on the map to add tree locations</span>
+                    </div>
+                  </div>
 
                   <Button
                     variant="outline"
@@ -310,30 +328,32 @@ export default function AreaSurveyPage() {
             )}
 
             {step === 'survey' && surveyMethod === 'detailed' && addingTreeAt && (
-              <TreeQuickForm
+              <EnhancedTreeQuickForm
                 location={addingTreeAt}
                 onSubmit={handleTreeSubmit}
                 onCancel={() => setAddingTreeAt(null)}
                 onSaveAndContinue={handleSaveAndContinue}
                 treeNumber={treeCount + 1}
+                projectId={projectId}
               />
             )}
 
             {step === 'survey' && surveyMethod === 'grid' && drawnArea && areaDetails && (
-              <GridSamplingPanel
+              <EnhancedGridSamplingPanel
                 projectArea={drawnArea}
                 areaHectares={areaDetails.areaHectares}
                 onSurveyComplete={(results) => {
                   setStep('complete');
                   toast.success(`Survey complete! Estimated ${results.estimatedTotal} trees.`);
                 }}
+                projectId={projectId}
               />
             )}
 
             {step === 'survey' && surveyMethod === 'ai' && (
               <AITreeDetection
                 projectId={project.id}
-                onDetectionComplete={(result) => {
+                onDetectionComplete={() => {
                   setStep('complete');
                   toast.success('AI detection complete!');
                 }}
@@ -380,11 +400,14 @@ export default function AreaSurveyPage() {
             <Card className="glass-card h-[calc(100vh-200px)] min-h-[500px]">
               <CardContent className="p-0 h-full">
                 <InteractiveAreaMap
+                  ref={mapRef}
                   center={mapCenter}
                   zoom={mapZoom}
                   drawingMode={drawingMode}
                   onAreaDrawn={handleAreaDrawn}
+                  onMapClick={handleMapClick}
                   drawnArea={drawnArea}
+                  treeMarkers={treeMarkers}
                   className="h-full rounded-lg"
                 />
               </CardContent>
