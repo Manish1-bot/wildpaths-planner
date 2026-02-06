@@ -197,55 +197,100 @@ export type Database = {
       }
       corridor_observations: {
         Row: {
+          analysis_parameters: Json | null
+          barrier_count: number | null
           connectivity_notes: string | null
+          connectivity_score: number | null
+          corridor_path_geojson: Json | null
           corridor_type: string | null
           created_at: string | null
           description: string | null
+          estimated_cost: number | null
           geojson_data: Json
+          habitat_quality_avg: number | null
           id: string
+          implementation_status: string | null
+          interventions: Json | null
+          least_cost_score: number | null
           metadata: Json | null
           name: string
+          pinch_points: Json | null
           priority: string | null
           project_id: string
+          resistance_matrix: Json | null
           risk_factors: string[] | null
+          source_area_geojson: Json | null
           status: string | null
+          target_area_geojson: Json | null
           target_species: string[] | null
+          timeline_months: number | null
+          total_length_km: number | null
           updated_at: string | null
           user_id: string
           width_meters: number | null
         }
         Insert: {
+          analysis_parameters?: Json | null
+          barrier_count?: number | null
           connectivity_notes?: string | null
+          connectivity_score?: number | null
+          corridor_path_geojson?: Json | null
           corridor_type?: string | null
           created_at?: string | null
           description?: string | null
+          estimated_cost?: number | null
           geojson_data: Json
+          habitat_quality_avg?: number | null
           id?: string
+          implementation_status?: string | null
+          interventions?: Json | null
+          least_cost_score?: number | null
           metadata?: Json | null
           name: string
+          pinch_points?: Json | null
           priority?: string | null
           project_id: string
+          resistance_matrix?: Json | null
           risk_factors?: string[] | null
+          source_area_geojson?: Json | null
           status?: string | null
+          target_area_geojson?: Json | null
           target_species?: string[] | null
+          timeline_months?: number | null
+          total_length_km?: number | null
           updated_at?: string | null
           user_id: string
           width_meters?: number | null
         }
         Update: {
+          analysis_parameters?: Json | null
+          barrier_count?: number | null
           connectivity_notes?: string | null
+          connectivity_score?: number | null
+          corridor_path_geojson?: Json | null
           corridor_type?: string | null
           created_at?: string | null
           description?: string | null
+          estimated_cost?: number | null
           geojson_data?: Json
+          habitat_quality_avg?: number | null
           id?: string
+          implementation_status?: string | null
+          interventions?: Json | null
+          least_cost_score?: number | null
           metadata?: Json | null
           name?: string
+          pinch_points?: Json | null
           priority?: string | null
           project_id?: string
+          resistance_matrix?: Json | null
           risk_factors?: string[] | null
+          source_area_geojson?: Json | null
           status?: string | null
+          target_area_geojson?: Json | null
           target_species?: string[] | null
+          timeline_months?: number | null
+          total_length_km?: number | null
           updated_at?: string | null
           user_id?: string
           width_meters?: number | null
@@ -428,6 +473,111 @@ export type Database = {
           },
         ]
       }
+      impact_analyses: {
+        Row: {
+          affected_trees: number | null
+          analysis_name: string
+          buffer_distance_m: number | null
+          by_health: Json | null
+          by_size: Json | null
+          by_species: Json | null
+          corridor_id: string | null
+          created_at: string | null
+          direct_removal: number | null
+          high_impact: number | null
+          id: string
+          impact_criteria: Json | null
+          impact_percentage: number | null
+          implementation_cost: number | null
+          medium_impact: number | null
+          mitigation_measures: Json | null
+          project_id: string
+          report_data: Json | null
+          report_url: string | null
+          root_zone_multiplier: number | null
+          safe_trees: number | null
+          season: string | null
+          spatial_distribution: Json | null
+          total_compensation: number | null
+          total_trees: number | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          affected_trees?: number | null
+          analysis_name: string
+          buffer_distance_m?: number | null
+          by_health?: Json | null
+          by_size?: Json | null
+          by_species?: Json | null
+          corridor_id?: string | null
+          created_at?: string | null
+          direct_removal?: number | null
+          high_impact?: number | null
+          id?: string
+          impact_criteria?: Json | null
+          impact_percentage?: number | null
+          implementation_cost?: number | null
+          medium_impact?: number | null
+          mitigation_measures?: Json | null
+          project_id: string
+          report_data?: Json | null
+          report_url?: string | null
+          root_zone_multiplier?: number | null
+          safe_trees?: number | null
+          season?: string | null
+          spatial_distribution?: Json | null
+          total_compensation?: number | null
+          total_trees?: number | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          affected_trees?: number | null
+          analysis_name?: string
+          buffer_distance_m?: number | null
+          by_health?: Json | null
+          by_size?: Json | null
+          by_species?: Json | null
+          corridor_id?: string | null
+          created_at?: string | null
+          direct_removal?: number | null
+          high_impact?: number | null
+          id?: string
+          impact_criteria?: Json | null
+          impact_percentage?: number | null
+          implementation_cost?: number | null
+          medium_impact?: number | null
+          mitigation_measures?: Json | null
+          project_id?: string
+          report_data?: Json | null
+          report_url?: string | null
+          root_zone_multiplier?: number | null
+          safe_trees?: number | null
+          season?: string | null
+          spatial_distribution?: Json | null
+          total_compensation?: number | null
+          total_trees?: number | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "impact_analyses_corridor_id_fkey"
+            columns: ["corridor_id"]
+            isOneToOne: false
+            referencedRelation: "corridor_observations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "impact_analyses_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -531,6 +681,96 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      resistance_templates: {
+        Row: {
+          created_at: string | null
+          description: string | null
+          id: string
+          is_default: boolean | null
+          land_type_costs: Json
+          name: string
+          species_name: string | null
+          species_scientific: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          is_default?: boolean | null
+          land_type_costs: Json
+          name: string
+          species_name?: string | null
+          species_scientific?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          is_default?: boolean | null
+          land_type_costs?: Json
+          name?: string
+          species_name?: string | null
+          species_scientific?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      species_database: {
+        Row: {
+          carbon_sequestration_rate: number | null
+          common_name: string | null
+          created_at: string | null
+          ecological_value_notes: string | null
+          family: string | null
+          growth_rate: string | null
+          id: string
+          lifespan_years: number | null
+          local_names: Json | null
+          max_dbh_cm: number | null
+          max_height_m: number | null
+          oxygen_production_rate: number | null
+          photo_url: string | null
+          scientific_name: string
+          vulnerability_index: number | null
+        }
+        Insert: {
+          carbon_sequestration_rate?: number | null
+          common_name?: string | null
+          created_at?: string | null
+          ecological_value_notes?: string | null
+          family?: string | null
+          growth_rate?: string | null
+          id?: string
+          lifespan_years?: number | null
+          local_names?: Json | null
+          max_dbh_cm?: number | null
+          max_height_m?: number | null
+          oxygen_production_rate?: number | null
+          photo_url?: string | null
+          scientific_name: string
+          vulnerability_index?: number | null
+        }
+        Update: {
+          carbon_sequestration_rate?: number | null
+          common_name?: string | null
+          created_at?: string | null
+          ecological_value_notes?: string | null
+          family?: string | null
+          growth_rate?: string | null
+          id?: string
+          lifespan_years?: number | null
+          local_names?: Json | null
+          max_dbh_cm?: number | null
+          max_height_m?: number | null
+          oxygen_production_rate?: number | null
+          photo_url?: string | null
+          scientific_name?: string
+          vulnerability_index?: number | null
+        }
+        Relationships: []
       }
       tree_analysis_results: {
         Row: {
@@ -651,9 +891,17 @@ export type Database = {
       }
       tree_observations: {
         Row: {
+          accuracy_m: number | null
           age_years: number | null
+          annual_oxygen_kg: number | null
+          biodiversity_score: number | null
           canopy_diameter_meters: number | null
+          canopy_ew_m: number | null
+          canopy_ns_m: number | null
+          carbon_stored_kg: number | null
           created_at: string | null
+          crown_density_percent: number | null
+          habitat_value: string | null
           health_status: string | null
           height_meters: number | null
           id: string
@@ -662,20 +910,36 @@ export type Database = {
           latitude: number
           longitude: number
           metadata: Json | null
+          monetary_value: number | null
           notes: string | null
           observation_date: string | null
+          pests_diseases: string[] | null
           photo_urls: string[] | null
           project_id: string
+          root_zone_radius_m: number | null
           species: string | null
+          species_scientific: string | null
+          species_vulnerability_index: number | null
+          structural_issues: string[] | null
+          tree_code: string | null
           tree_id: string | null
           trunk_diameter_cm: number | null
           updated_at: string | null
           user_id: string
+          verification_status: string | null
         }
         Insert: {
+          accuracy_m?: number | null
           age_years?: number | null
+          annual_oxygen_kg?: number | null
+          biodiversity_score?: number | null
           canopy_diameter_meters?: number | null
+          canopy_ew_m?: number | null
+          canopy_ns_m?: number | null
+          carbon_stored_kg?: number | null
           created_at?: string | null
+          crown_density_percent?: number | null
+          habitat_value?: string | null
           health_status?: string | null
           height_meters?: number | null
           id?: string
@@ -684,20 +948,36 @@ export type Database = {
           latitude: number
           longitude: number
           metadata?: Json | null
+          monetary_value?: number | null
           notes?: string | null
           observation_date?: string | null
+          pests_diseases?: string[] | null
           photo_urls?: string[] | null
           project_id: string
+          root_zone_radius_m?: number | null
           species?: string | null
+          species_scientific?: string | null
+          species_vulnerability_index?: number | null
+          structural_issues?: string[] | null
+          tree_code?: string | null
           tree_id?: string | null
           trunk_diameter_cm?: number | null
           updated_at?: string | null
           user_id: string
+          verification_status?: string | null
         }
         Update: {
+          accuracy_m?: number | null
           age_years?: number | null
+          annual_oxygen_kg?: number | null
+          biodiversity_score?: number | null
           canopy_diameter_meters?: number | null
+          canopy_ew_m?: number | null
+          canopy_ns_m?: number | null
+          carbon_stored_kg?: number | null
           created_at?: string | null
+          crown_density_percent?: number | null
+          habitat_value?: string | null
           health_status?: string | null
           height_meters?: number | null
           id?: string
@@ -706,15 +986,23 @@ export type Database = {
           latitude?: number
           longitude?: number
           metadata?: Json | null
+          monetary_value?: number | null
           notes?: string | null
           observation_date?: string | null
+          pests_diseases?: string[] | null
           photo_urls?: string[] | null
           project_id?: string
+          root_zone_radius_m?: number | null
           species?: string | null
+          species_scientific?: string | null
+          species_vulnerability_index?: number | null
+          structural_issues?: string[] | null
+          tree_code?: string | null
           tree_id?: string | null
           trunk_diameter_cm?: number | null
           updated_at?: string | null
           user_id?: string
+          verification_status?: string | null
         }
         Relationships: [
           {
