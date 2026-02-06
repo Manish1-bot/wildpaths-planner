@@ -164,6 +164,28 @@ export default function ProjectDetail() {
             </CardContent>
           </Card>
 
+          {/* Area Survey - NEW */}
+          <Card className="glass-card border-amber-500/30 bg-amber-500/5">
+            <CardContent className="py-4">
+              <div className="flex items-center gap-3 mb-3">
+                <div className="p-2 rounded-lg bg-amber-500/10">
+                  <Map className="h-5 w-5 text-amber-600" />
+                </div>
+                <div>
+                  <h3 className="font-heading font-semibold">Area Survey</h3>
+                  <p className="text-xs text-muted-foreground">
+                    Address-based tree surveys
+                  </p>
+                </div>
+              </div>
+              <Button asChild variant="outline" size="sm" className="w-full border-amber-500/50 text-amber-600 hover:bg-amber-500/10">
+                <Link to={`/project/${project.id}/area-survey`}>
+                  Open Module
+                </Link>
+              </Button>
+            </CardContent>
+          </Card>
+
           {/* Tree Data Entry */}
           <Card className="glass-card border-emerald-500/30 bg-emerald-500/5">
             <CardContent className="py-4">
