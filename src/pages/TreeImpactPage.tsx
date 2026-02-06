@@ -6,8 +6,12 @@ import { TreeImpactAnalysisPanel } from '@/components/tree-impact/TreeImpactAnal
 import { TreeImpactResults } from '@/components/tree-impact/TreeImpactResults';
 import { TreeImpactMap } from '@/components/tree-impact/TreeImpactMap';
 import { AnalyticsDashboard } from '@/components/analytics/AnalyticsDashboard';
+import { ProfessionalDashboard } from '@/components/analytics/ProfessionalDashboard';
+import { ScientificImpactCalculator } from '@/components/tree-impact/ScientificImpactCalculator';
+import { AITreeDetection } from '@/components/tree-impact/AITreeDetection';
 import { useProject } from '@/hooks/useProjects';
 import { useTreeDatasets, useTreeAnalysisResults } from '@/hooks/useTreeImpactAnalysis';
+import { useTreeObservations } from '@/hooks/useTreeObservations';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -22,9 +26,13 @@ import {
   Download,
   Trees,
   AlertTriangle,
-  PieChart
+  PieChart,
+  Calculator,
+  Satellite,
+  FileDown
 } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
+import { exportTreesAsGeoJSON, exportTreesAsCSV, exportImpactSummaryAsCSV } from '@/lib/exportUtils';
 
 export default function TreeImpactPage() {
   const { projectId } = useParams<{ projectId: string }>();
@@ -41,6 +49,12 @@ export default function TreeImpactPage() {
     runTreeImpactAnalysis,
     deleteTreeAnalysisResult
   } = useTreeAnalysisResults(projectId);
+  
+  const {
+    trees: treeObservations,
+    treesAsGeoJSON,
+    stats: treeStats,
+  } = useTreeObservations(projectId);
   
   const [activeTab, setActiveTab] = useState('upload');
 
@@ -141,13 +155,17 @@ export default function TreeImpactPage() {
 
         {/* Tabs */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          <TabsList className="grid grid-cols-4 w-full max-w-lg">
+          <TabsList className="grid grid-cols-6 w-full max-w-2xl">
             <TabsTrigger value="upload" className="flex items-center gap-1.5">
               <Upload className="h-4 w-4" />
               <span className="hidden sm:inline">Upload</span>
             </TabsTrigger>
+            <TabsTrigger value="ai" className="flex items-center gap-1.5">
+              <Satellite className="h-4 w-4" />
+              <span className="hidden sm:inline">AI</span>
+            </TabsTrigger>
             <TabsTrigger value="analyze" className="flex items-center gap-1.5">
-              <BarChart3 className="h-4 w-4" />
+              <Calculator className="h-4 w-4" />
               <span className="hidden sm:inline">Analyze</span>
             </TabsTrigger>
             <TabsTrigger value="map" className="flex items-center gap-1.5">
@@ -155,8 +173,12 @@ export default function TreeImpactPage() {
               <span className="hidden sm:inline">Map</span>
             </TabsTrigger>
             <TabsTrigger value="results" className="flex items-center gap-1.5">
-              <FileText className="h-4 w-4" />
+              <BarChart3 className="h-4 w-4" />
               <span className="hidden sm:inline">Results</span>
+            </TabsTrigger>
+            <TabsTrigger value="export" className="flex items-center gap-1.5">
+              <FileDown className="h-4 w-4" />
+              <span className="hidden sm:inline">Export</span>
             </TabsTrigger>
           </TabsList>
 
@@ -170,14 +192,84 @@ export default function TreeImpactPage() {
             />
           </TabsContent>
 
+          {/* AI Detection Tab */}
+          <TabsContent value="ai">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <AITreeDetection
+                projectId={project.id}
+                onDetectionComplete={(result) => {
+                  console.log('AI Detection result:', result);
+                }}
+              />
+              <Card className="glass-card">
+                <CardHeader>
+                  <CardTitle className="font-heading flex items-center gap-2">
+                    <Satellite className="h-5 w-5 text-primary" />
+                    How AI Detection Works
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="space-y-3">
+                    <div className="flex items-start gap-3">
+                      <div className="w-6 h-6 rounded-full bg-primary flex items-center justify-center text-primary-foreground text-xs font-bold shrink-0">1</div>
+                      <div>
+                        <p className="text-sm font-medium">Upload Imagery</p>
+                        <p className="text-xs text-muted-foreground">Satellite, drone, or aerial images</p>
+                      </div>
+                    </div>
+                    <div className="flex items-start gap-3">
+                      <div className="w-6 h-6 rounded-full bg-primary/80 flex items-center justify-center text-primary-foreground text-xs font-bold shrink-0">2</div>
+                      <div>
+                        <p className="text-sm font-medium">AI Analysis</p>
+                        <p className="text-xs text-muted-foreground">Gemini vision model detects trees and vegetation</p>
+                      </div>
+                    </div>
+                    <div className="flex items-start gap-3">
+                      <div className="w-6 h-6 rounded-full bg-primary/60 flex items-center justify-center text-primary-foreground text-xs font-bold shrink-0">3</div>
+                      <div>
+                        <p className="text-sm font-medium">Get Results</p>
+                        <p className="text-xs text-muted-foreground">Tree counts, species, health assessment</p>
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          </TabsContent>
+
           {/* Analyze Tab */}
           <TabsContent value="analyze">
-            <TreeImpactAnalysisPanel
-              treeDatasets={treeDatasets}
-              onRunAnalysis={handleRunAnalysis}
-              onDeleteDataset={(id) => deleteTreeDataset.mutate(id)}
-              isAnalyzing={runTreeImpactAnalysis.isPending}
-            />
+            <div className="space-y-6">
+              <TreeImpactAnalysisPanel
+                treeDatasets={treeDatasets}
+                onRunAnalysis={handleRunAnalysis}
+                onDeleteDataset={(id) => deleteTreeDataset.mutate(id)}
+                isAnalyzing={runTreeImpactAnalysis.isPending}
+              />
+              
+              {/* Scientific Calculator */}
+              {treeObservations.length > 0 && devDataset?.geojson_data && (
+                <ScientificImpactCalculator
+                  treeData={treeObservations.map(t => ({
+                    id: t.id,
+                    species: t.species || 'Unknown',
+                    height: t.height_meters || 10,
+                    dbh: t.trunk_diameter_cm || 30,
+                    canopyRadius: (t.canopy_diameter_meters || 5) / 2,
+                    healthScore: t.health_status === 'excellent' ? 10 : 
+                                 t.health_status === 'good' ? 8 :
+                                 t.health_status === 'fair' ? 6 :
+                                 t.health_status === 'poor' ? 4 : 2,
+                    age: t.age_years || 20,
+                    coordinates: [t.longitude, t.latitude],
+                  }))}
+                  developmentGeoJSON={devDataset.geojson_data as GeoJSON.FeatureCollection}
+                  onAnalysisComplete={(results) => {
+                    console.log('Scientific analysis:', results);
+                  }}
+                />
+              )}
+            </div>
           </TabsContent>
 
           {/* Map Tab */}
@@ -331,6 +423,93 @@ export default function TreeImpactPage() {
                 </CardContent>
               </Card>
             )}
+          </TabsContent>
+
+          {/* Export Tab */}
+          <TabsContent value="export">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <Card className="glass-card">
+                <CardHeader>
+                  <CardTitle className="font-heading flex items-center gap-2">
+                    <Download className="h-5 w-5 text-primary" />
+                    Export Tree Data
+                  </CardTitle>
+                  <CardDescription>
+                    Download tree observations in various formats
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <Button 
+                    variant="outline" 
+                    className="w-full justify-start"
+                    onClick={() => exportTreesAsGeoJSON(treeObservations, `${project.name}_trees.geojson`)}
+                    disabled={treeObservations.length === 0}
+                  >
+                    <FileDown className="h-4 w-4 mr-2" />
+                    Export as GeoJSON
+                    <Badge variant="secondary" className="ml-auto">{treeObservations.length} trees</Badge>
+                  </Button>
+                  <Button 
+                    variant="outline" 
+                    className="w-full justify-start"
+                    onClick={() => exportTreesAsCSV(treeObservations, `${project.name}_trees.csv`)}
+                    disabled={treeObservations.length === 0}
+                  >
+                    <FileDown className="h-4 w-4 mr-2" />
+                    Export as CSV
+                    <Badge variant="secondary" className="ml-auto">Excel Compatible</Badge>
+                  </Button>
+                </CardContent>
+              </Card>
+
+              <Card className="glass-card">
+                <CardHeader>
+                  <CardTitle className="font-heading flex items-center gap-2">
+                    <BarChart3 className="h-5 w-5 text-primary" />
+                    Export Analysis Results
+                  </CardTitle>
+                  <CardDescription>
+                    Download impact analysis summaries
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <Button 
+                    variant="outline" 
+                    className="w-full justify-start"
+                    onClick={() => {
+                      if (latestResult) {
+                        exportImpactSummaryAsCSV(
+                          {
+                            total_trees: latestResult.total_trees,
+                            affected_trees: latestResult.affected_trees,
+                            safe_trees: latestResult.safe_trees,
+                            tree_loss_percentage: latestResult.tree_loss_percentage,
+                            buffer_meters: latestResult.buffer_meters,
+                          },
+                          treeObservations,
+                          `${project.name}_impact_analysis.csv`
+                        );
+                      }
+                    }}
+                    disabled={!latestResult}
+                  >
+                    <FileDown className="h-4 w-4 mr-2" />
+                    Export Impact Summary (CSV)
+                  </Button>
+                  <Button 
+                    asChild
+                    variant="default"
+                    className="w-full"
+                    disabled={!latestResult}
+                  >
+                    <Link to={`/project/${project.id}/tree-impact-report`}>
+                      <FileText className="h-4 w-4 mr-2" />
+                      Generate Full PDF Report
+                    </Link>
+                  </Button>
+                </CardContent>
+              </Card>
+            </div>
           </TabsContent>
         </Tabs>
       </main>

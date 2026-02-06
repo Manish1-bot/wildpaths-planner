@@ -3,10 +3,12 @@ import { useParams, Link } from 'react-router-dom';
 import { AppHeader } from '@/components/layout/AppHeader';
 import { MapViewer } from '@/components/map/MapViewer';
 import { FieldObservationForm } from '@/components/corridor/FieldObservationForm';
+import { ResistanceMatrixEditor } from '@/components/corridor/ResistanceMatrixEditor';
 import { AnalyticsDashboard } from '@/components/analytics/AnalyticsDashboard';
 import { useProject } from '@/hooks/useProjects';
 import { useFieldObservations } from '@/hooks/useFieldObservations';
 import { useCorridorObservations } from '@/hooks/useCorridorObservations';
+import { useResistanceTemplates } from '@/hooks/useResistanceTemplates';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -26,11 +28,14 @@ import {
   AlertTriangle,
   Trees,
   Building,
-  Map
+  Map,
+  Settings,
+  Download
 } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { exportCorridorAsGeoJSON } from '@/lib/exportUtils';
 
 export default function CorridorPlanningPage() {
   const { projectId } = useParams<{ projectId: string }>();
@@ -50,14 +55,22 @@ export default function CorridorPlanningPage() {
     corridorsAsGeoJSON,
     isLoading: corridorsLoading,
     createCorridor,
-    deleteCorridor
+    deleteCorridor,
+    updateCorridor
   } = useCorridorObservations(projectId);
+
+  const {
+    templates,
+    isLoading: templatesLoading,
+    createTemplate,
+  } = useResistanceTemplates();
 
   const [activeTab, setActiveTab] = useState('map');
   const [showForm, setShowForm] = useState(false);
   const [selectedCoords, setSelectedCoords] = useState<{ lat: number; lng: number } | undefined>();
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [aiAnalysis, setAiAnalysis] = useState<any>(null);
+  const [selectedCorridor, setSelectedCorridor] = useState<string | null>(null);
 
   if (projectLoading) {
     return (
@@ -246,7 +259,7 @@ export default function CorridorPlanningPage() {
 
         {/* Tabs */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          <TabsList className="grid grid-cols-4 w-full max-w-lg">
+          <TabsList className="grid grid-cols-5 w-full max-w-xl">
             <TabsTrigger value="map" className="flex items-center gap-2">
               <Map className="h-4 w-4" />
               <span className="hidden sm:inline">Map</span>
@@ -254,6 +267,10 @@ export default function CorridorPlanningPage() {
             <TabsTrigger value="observations" className="flex items-center gap-2">
               <MapPin className="h-4 w-4" />
               <span className="hidden sm:inline">Data</span>
+            </TabsTrigger>
+            <TabsTrigger value="resistance" className="flex items-center gap-2">
+              <Settings className="h-4 w-4" />
+              <span className="hidden sm:inline">Matrix</span>
             </TabsTrigger>
             <TabsTrigger value="analysis" className="flex items-center gap-2">
               <Brain className="h-4 w-4" />
