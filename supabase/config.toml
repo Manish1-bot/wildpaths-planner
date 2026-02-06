@@ -1,7 +1,7 @@
 project_id = "kmvqgjgnebqmeatpzsux"
 
 [functions.ai-tree-detection]
-verify_jwt = true
+verify_jwt = false
 
 [functions.ai-tree-analysis]
 verify_jwt = true
